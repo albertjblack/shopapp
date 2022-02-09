@@ -16,16 +16,34 @@ class CartItem {
 
 class Cart with ChangeNotifier {
   // map every cart item to the id of the product it belongs to
-  Map<String, CartItem>? _items; // nothing initially
+  Map<String, CartItem> _items = {}; // nothing initially
   Map<String, CartItem> get items {
-    return {..._items!};
+    return {..._items};
+  }
+
+  int get itemCount {
+    try {
+      return _items.length;
+    } catch (e) {
+      return 0;
+    }
+  }
+
+  double get totalSum {
+    var _total = 0.0;
+    try {
+      _items.forEach((key, value) {
+        _total += value.price! * value.quantity!;
+      });
+    } catch (e) {}
+    return _total;
   }
 
   void addItem(String productId, double productPrice, String productTitle) {
     // check if we already have the item -- if we do -- we only increase quantity
-    if (_items!.containsKey(productId)) {
+    if (_items.containsKey(productId)) {
       // chg qty
-      _items!.update(
+      _items.update(
           productId,
           (existing) => CartItem(
               id: existing.id,
@@ -34,7 +52,7 @@ class Cart with ChangeNotifier {
               price: existing.price! + productPrice));
     } else {
       // add item
-      _items!.putIfAbsent(
+      _items.putIfAbsent(
           productId,
           () => CartItem(
               id: DateTime.now().toString(),
@@ -42,5 +60,8 @@ class Cart with ChangeNotifier {
               quantity: 1,
               price: productPrice));
     }
+
+    // notify listeners of changes
+    notifyListeners();
   }
 }
