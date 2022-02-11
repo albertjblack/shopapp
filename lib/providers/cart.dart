@@ -1,13 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class CartItem {
+class _CartItem {
   final String? id;
   final String? title;
   final int? quantity;
   final double? price;
 
-  CartItem(
+  _CartItem(
       {@required this.id, // diff from the product
       @required this.title,
       @required this.quantity,
@@ -16,8 +16,8 @@ class CartItem {
 
 class Cart with ChangeNotifier {
   // map every cart item to the id of the product it belongs to
-  Map<String, CartItem> _items = {}; // nothing initially
-  Map<String, CartItem> get items {
+  Map<String, _CartItem> _items = {}; // nothing initially
+  Map<String, _CartItem> get items {
     return {..._items};
   }
 
@@ -45,7 +45,7 @@ class Cart with ChangeNotifier {
       // chg qty
       _items.update(
           productId,
-          (existing) => CartItem(
+          (existing) => _CartItem(
               id: existing.id,
               title: existing.title,
               quantity: existing.quantity! + 1,
@@ -54,7 +54,7 @@ class Cart with ChangeNotifier {
       // add item
       _items.putIfAbsent(
           productId,
-          () => CartItem(
+          () => _CartItem(
               id: DateTime.now().toString(),
               title: productTitle,
               quantity: 1,
