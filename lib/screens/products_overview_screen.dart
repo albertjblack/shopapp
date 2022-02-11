@@ -68,6 +68,6 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
             )
           ],
         ),
-        body: ProductsGrid(_showOnlyFavs));
+        body: ProductsGrid(showOnlyFavs: _showOnlyFavs));
   }
 }

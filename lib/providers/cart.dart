@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class _CartItem {
   final String? id;
   final String? title;
+  final String? productId;
   final int? quantity;
   final double? price;
 
@@ -11,7 +12,8 @@ class _CartItem {
       {@required this.id, // diff from the product
       @required this.title,
       @required this.quantity,
-      @required this.price});
+      @required this.price,
+      @required this.productId});
 }
 
 class Cart with ChangeNotifier {
@@ -38,7 +40,8 @@ class Cart with ChangeNotifier {
     return _total;
   }
 
-  void addItem(String productId, double productPrice, String productTitle) {
+  void addItem(String productId, double productPrice, String productTitle,
+      String _productId) {
     // check if we already have the item -- if we do -- we only increase quantity
     if (_items.containsKey(productId)) {
       // chg qty
@@ -48,7 +51,8 @@ class Cart with ChangeNotifier {
               id: existing.id,
               title: existing.title,
               quantity: existing.quantity! + 1,
-              price: existing.price! + productPrice));
+              price: existing.price! + productPrice,
+              productId: _productId));
     } else {
       // add item
       _items.putIfAbsent(
@@ -57,10 +61,40 @@ class Cart with ChangeNotifier {
               id: DateTime.now().toString(),
               title: productTitle,
               quantity: 1,
-              price: productPrice));
+              price: productPrice,
+              productId: _productId));
     }
 
     // notify listeners of changes
     notifyListeners();
+  }
+
+  void removeItem(String _productId) {
+    if (_items.containsKey(_productId)) {
+      _items.remove(_productId);
+    }
+    notifyListeners();
+  }
+
+  void substractItem(String _productId, int quantity) async {
+    // Operation was successful and item was removed from remote server
+    // Dismissible is removed
+    if (_items.containsKey(_productId)) {
+      if (_items[_productId]!.quantity! - 1 <= 0) {
+        removeItem(_productId);
+      } else {
+        _items.update(
+            _productId,
+            (existing) => _CartItem(
+                id: existing.id,
+                title: existing.title,
+                quantity: existing.quantity! - 1,
+                price: existing.price!,
+                productId: _productId));
+        notifyListeners();
+      }
+
+      // Operation failed and Dismissible is reset
+    }
   }
 }
