@@ -6,33 +6,41 @@ class CartItem extends StatelessWidget {
   final int? quantity;
   final double? price;
 
-  CartItem(
+  const CartItem(
       {@required this.id, // diff from the product
       @required this.title,
       @required this.quantity,
-      @required this.price});
+      @required this.price,
+      Key? key})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: EdgeInsets.symmetric(horizontal: 15, vertical: 4),
-      child: Padding(
-        padding: EdgeInsets.all(8),
-        child: ListTile(
-          leading: CircleAvatar(
-            backgroundColor: Theme.of(context).primaryColor,
-            child: Padding(
-              padding: EdgeInsets.all(4),
-              child: FittedBox(
-                  child: Text(
-                "\$${price}",
-                style: TextStyle(color: Colors.white),
-              )),
+    return Dismissible(
+      key: ValueKey(id),
+      background: Container(
+          color: Theme.of(context)
+              .errorColor), // this is the cart_item id, not the productId from map
+      child: Card(
+        margin: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+        child: Padding(
+          padding: const EdgeInsets.all(8),
+          child: ListTile(
+            leading: CircleAvatar(
+              backgroundColor: Theme.of(context).primaryColor,
+              child: Padding(
+                padding: const EdgeInsets.all(4),
+                child: FittedBox(
+                    child: Text(
+                  "\$$price",
+                  style: const TextStyle(color: Colors.white),
+                )),
+              ),
             ),
+            title: Text(title!),
+            subtitle: Text("Total: \$${price! * quantity!}"),
+            trailing: Text("${quantity!}x"),
           ),
-          title: Text(title!),
-          subtitle: Text("Total: \$${price! * quantity!}"),
-          trailing: Text("${quantity!}x"),
         ),
       ),
     );

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 
 import './../providers/products_provider.dart';
 import './../constants/constants.dart';
-import './../models/product.dart';
 
 class ProductDetailScreen extends StatelessWidget {
+  const ProductDetailScreen({Key? key}) : super(key: key);
+
   static const routeName = '/product-detail';
   //Product product;
   //ProductDetailScreen(@required this.product);
@@ -17,7 +17,7 @@ class ProductDetailScreen extends StatelessWidget {
         .getElementById(productId);
     return Scaffold(
       appBar: AppBar(
-        title: Text(appTitle),
+        title: const Text(appTitle),
       ),
       body: Container(
         width: double.infinity,

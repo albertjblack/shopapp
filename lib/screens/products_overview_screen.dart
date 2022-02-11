@@ -12,9 +12,11 @@ import './../providers/cart.dart';
 
 import './cart_screen.dart';
 
-enum FilterOptions { Favorites, All }
+enum FilterOptions { favorites, all }
 
 class ProductsOverviewScreen extends StatefulWidget {
+  const ProductsOverviewScreen({Key? key}) : super(key: key);
+
   @override
   State<ProductsOverviewScreen> createState() => _ProductsOverviewScreenState();
 }
@@ -28,11 +30,11 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(appTitle),
+          title: const Text(appTitle),
           actions: [
             PopupMenuButton(
                 onSelected: (FilterOptions selectedValue) {
-                  if (selectedValue == FilterOptions.Favorites) {
+                  if (selectedValue == FilterOptions.favorites) {
                     // do something that reduces the amount of items we show
                     setState(() {
                       _showOnlyFavs = true;
@@ -44,13 +46,13 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
                     });
                   }
                 },
-                icon: Icon(Icons.more_vert),
+                icon: const Icon(Icons.more_vert),
                 itemBuilder: (_) => [
-                      PopupMenuItem(
+                      const PopupMenuItem(
                           child: Text('Only Favorites'),
-                          value: FilterOptions.Favorites),
-                      PopupMenuItem(
-                          child: Text('Show All'), value: FilterOptions.All)
+                          value: FilterOptions.favorites),
+                      const PopupMenuItem(
+                          child: Text('Show All'), value: FilterOptions.all)
                     ]),
             Consumer<Cart>(
               builder: (_, cart, ch) => Badge(
@@ -58,7 +60,7 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
                   child: ch, // child of badge
                   value: cart.itemCount.toString()),
               child: IconButton(
-                icon: Icon(Icons.shopping_cart),
+                icon: const Icon(Icons.shopping_cart),
                 onPressed: () {
                   Navigator.of(context).pushNamed(CartScreen.routeName);
                 },

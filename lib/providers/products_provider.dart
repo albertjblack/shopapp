@@ -8,7 +8,7 @@ class ProductsProvider with ChangeNotifier {
   // changenotifier allows us to establish behind the scenes comunications with the help of context
   // we do not want to edit _items when product change
   // we want to call a method to update the _items with listeners
-  List<Product> _items = DUMMY_PRODUCTS;
+  final List<Product> _items = dummyProducts;
 
   // since the _items is private we need to add a getter
   List<Product> get items {

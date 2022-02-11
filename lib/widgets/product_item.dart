@@ -6,6 +6,7 @@ import '../../models/product.dart';
 import '../providers/cart.dart';
 
 class ProductItem extends StatelessWidget {
+  const ProductItem({Key? key}) : super(key: key);
   //Product? product;
   //ProductItem(this.product);
   @override
@@ -29,8 +30,8 @@ class ProductItem extends StatelessWidget {
             footer: GridTileBar(
               leading: IconButton(
                 icon: product.isFavorite!
-                    ? Icon(Icons.favorite)
-                    : Icon(Icons.favorite_border),
+                    ? const Icon(Icons.favorite)
+                    : const Icon(Icons.favorite_border),
                 onPressed: () => product.toggleFavorite(),
               ),
               backgroundColor: Colors.black54,
@@ -39,7 +40,7 @@ class ProductItem extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               trailing: IconButton(
-                icon: Icon(Icons.add_shopping_cart),
+                icon: const Icon(Icons.add_shopping_cart),
                 onPressed: () {
                   cart.addItem(product.id!, product.price!, product.title!);
                 },

@@ -30,9 +30,9 @@ class MyApp extends StatelessWidget {
             secondaryHeaderColor: Color(secondaryColor),
             fontFamily: 'Lato'),
         routes: {
-          '/': (context) => ProductsOverviewScreen(),
-          ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
-          CartScreen.routeName: (ctx) => CartScreen()
+          '/': (context) => const ProductsOverviewScreen(),
+          ProductDetailScreen.routeName: (ctx) => const ProductDetailScreen(),
+          CartScreen.routeName: (ctx) => const CartScreen()
         },
       ),
     );

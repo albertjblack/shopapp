@@ -5,6 +5,7 @@ import './../providers/cart.dart';
 import './../widgets/cart_item.dart';
 
 class CartScreen extends StatelessWidget {
+  const CartScreen({Key? key}) : super(key: key);
   static const routeName = "/cart";
 
   @override
@@ -15,14 +16,14 @@ class CartScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("My Cart"),
+        title: const Text("My Cart"),
       ),
       body: Column(
         children: [
           Card(
-              margin: EdgeInsets.all(15),
+              margin: const EdgeInsets.all(15),
               child: Padding(
-                padding: EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -52,7 +53,7 @@ class CartScreen extends StatelessWidget {
                   ],
                 ),
               )),
-          SizedBox(
+          const SizedBox(
             height: 10,
           ),
           Expanded(

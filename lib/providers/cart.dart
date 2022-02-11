@@ -16,7 +16,8 @@ class _CartItem {
 
 class Cart with ChangeNotifier {
   // map every cart item to the id of the product it belongs to
-  Map<String, _CartItem> _items = {}; // nothing initially
+
+  final Map<String, _CartItem> _items = {}; // {ProductId: cartItem}
   Map<String, _CartItem> get items {
     return {..._items};
   }
@@ -31,11 +32,9 @@ class Cart with ChangeNotifier {
 
   double get totalSum {
     var _total = 0.0;
-    try {
-      _items.forEach((key, value) {
-        _total += value.price! * value.quantity!;
-      });
-    } catch (e) {}
+    _items.forEach((key, value) {
+      _total += value.price! * value.quantity!;
+    });
     return _total;
   }
 
