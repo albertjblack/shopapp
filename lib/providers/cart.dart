@@ -1,14 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
-class _CartItem {
+class MyCartItem {
   final String? id;
   final String? title;
   final String? productId;
   final int? quantity;
   final double? price;
 
-  _CartItem(
+  MyCartItem(
       {@required this.id, // diff from the product
       @required this.title,
       @required this.quantity,
@@ -19,8 +19,8 @@ class _CartItem {
 class Cart with ChangeNotifier {
   // map every cart item to the id of the product it belongs to
 
-  final Map<String, _CartItem> _items = {}; // {ProductId: cartItem}
-  Map<String, _CartItem> get items {
+  Map<String, MyCartItem> _items = {}; // {ProductId: cartItem}
+  Map<String, MyCartItem> get items {
     return {..._items};
   }
 
@@ -47,7 +47,7 @@ class Cart with ChangeNotifier {
       // chg qty
       _items.update(
           productId,
-          (existing) => _CartItem(
+          (existing) => MyCartItem(
               id: existing.id,
               title: existing.title,
               quantity: existing.quantity! + 1,
@@ -57,7 +57,7 @@ class Cart with ChangeNotifier {
       // add item
       _items.putIfAbsent(
           productId,
-          () => _CartItem(
+          () => MyCartItem(
               id: DateTime.now().toString(),
               title: productTitle,
               quantity: 1,
@@ -85,7 +85,7 @@ class Cart with ChangeNotifier {
       } else {
         _items.update(
             _productId,
-            (existing) => _CartItem(
+            (existing) => MyCartItem(
                 id: existing.id,
                 title: existing.title,
                 quantity: existing.quantity! - 1,
@@ -97,4 +97,10 @@ class Cart with ChangeNotifier {
       // Operation failed and Dismissible is reset
     }
   }
+
+  void clearCart() {
+    _items = {};
+    notifyListeners();
+  }
+  // final brace
 }

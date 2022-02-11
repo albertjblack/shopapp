@@ -2,7 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import './../providers/cart.dart';
+import './../providers/orders.dart';
+
+import './orders_screen.dart';
+
 import './../widgets/cart_item.dart';
+import './../widgets/app_drawer.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({Key? key}) : super(key: key);
@@ -13,6 +18,7 @@ class CartScreen extends StatelessWidget {
     // we'd like to make a list of items where we can delete them, a part to see full price and purchase too
 
     final cart = Provider.of<Cart>(context);
+    final orders = Provider.of<Orders>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
@@ -44,7 +50,15 @@ class CartScreen extends StatelessWidget {
                       backgroundColor: Theme.of(context).primaryColor,
                     ), // a little bit like our badge widget
                     TextButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          if (cart.totalSum > 0) {
+                            orders.addOrder(
+                                cart.items.values.toList(), cart.totalSum);
+                            cart.clearCart();
+                            Navigator.pushNamed(
+                                context, OrdersScreen.routeName);
+                          }
+                        },
                         child: Text(
                           "Order now",
                           style:
@@ -69,6 +83,7 @@ class CartScreen extends StatelessWidget {
           )
         ],
       ),
+      drawer: const AppDrawer(),
     );
   }
 }

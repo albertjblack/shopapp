@@ -45,11 +45,11 @@ class ProductDetailScreen extends StatelessWidget {
               ),
               decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.secondary.withAlpha(80),
-                  borderRadius: BorderRadius.only(
+                  borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(15),
                       bottomRight: Radius.circular(15))),
             ),
-            SizedBox(
+            const SizedBox(
               height: 10,
             ),
             Container(
