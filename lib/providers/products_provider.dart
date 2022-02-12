@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import './../constants/dummy_data.dart';
-import './../models/product.dart';
+import 'product.dart';
 
 // we only want to change data from within, so notifyListeners let know all the other part that are listening
 class ProductsProvider with ChangeNotifier {
