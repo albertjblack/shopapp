@@ -76,26 +76,23 @@ class Cart with ChangeNotifier {
     notifyListeners();
   }
 
-  void substractItem(String _productId, int quantity) async {
-    // Operation was successful and item was removed from remote server
-    // Dismissible is removed
-    if (_items.containsKey(_productId)) {
-      if (_items[_productId]!.quantity! - 1 <= 0) {
-        removeItem(_productId);
-      } else {
-        _items.update(
-            _productId,
-            (existing) => MyCartItem(
-                id: existing.id,
-                title: existing.title,
-                quantity: existing.quantity! - 1,
-                price: existing.price!,
-                productId: _productId));
-        notifyListeners();
-      }
-
-      // Operation failed and Dismissible is reset
+  void removeSingleItem(String _productId) {
+    if (!_items.containsKey(_productId)) {
+      return;
     }
+    if (_items[_productId]!.quantity! > 1) {
+      _items.update(
+          _productId,
+          (existing) => MyCartItem(
+              id: existing.id,
+              title: existing.title,
+              quantity: existing.quantity! - 1,
+              price: existing.price!,
+              productId: _productId));
+    } else {
+      removeItem(_productId);
+    }
+    notifyListeners();
   }
 
   void clearCart() {

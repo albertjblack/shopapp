@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 import './../providers/cart.dart';
 
@@ -18,15 +17,34 @@ class DismissCartItem extends StatelessWidget {
       : super(key: key);
   @override
   Widget build(BuildContext context) {
-    final quantity = Provider.of<Cart>(context).items[productId]!.quantity!;
     return Dismissible(
         direction: DismissDirection.endToStart,
         onDismissed: (direction) {
           if (direction == DismissDirection.startToEnd) {
-            cart!.substractItem(productId!, quantity);
           } else if (direction == DismissDirection.endToStart) {
             cart!.removeItem(productId!);
           }
+        },
+        confirmDismiss: (direction) {
+          return showDialog(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                    title: const Text("Are you sure?"),
+                    content: const Text(
+                        "Do you want to remove the item from the cart?"),
+                    actions: [
+                      TextButton(
+                          onPressed: () {
+                            Navigator.of(ctx).pop(true);
+                          },
+                          child: const Text("Yes")),
+                      TextButton(
+                          onPressed: () {
+                            Navigator.of(ctx).pop(false);
+                          },
+                          child: const Text("No"))
+                    ],
+                  ));
         },
         key: ValueKey(cartItemId!),
         background: Container(

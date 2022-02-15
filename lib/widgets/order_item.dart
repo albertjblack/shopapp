@@ -5,8 +5,6 @@ import 'package:intl/intl.dart';
 import 'dart:math';
 
 import './../providers/orders.dart';
-import './../providers/products_provider.dart';
-import './../widgets/product_item.dart';
 
 class OrderItem extends StatefulWidget {
   final MyOrderItem? ordItem;
@@ -25,7 +23,6 @@ class _OrderItemState extends State<OrderItem> {
         .orders
         .where((element) => element.id == widget.ordItem!.id)
         .first;
-    final products = Provider.of<ProductsProvider>(context);
     // this card is suppose to be expandable and show more details on tap
     return Card(
       margin: const EdgeInsets.all(10),
@@ -43,7 +40,7 @@ class _OrderItemState extends State<OrderItem> {
           ),
         ),
         if (isExpaned)
-          Container(
+          SizedBox(
             height: min(widget.ordItem!.items!.length * 20.0 + 10, 180.0),
             child: ListView.builder(
                 itemCount: order.items!.length,
@@ -57,7 +54,7 @@ class _OrderItemState extends State<OrderItem> {
                         child: FittedBox(
                           child: Text(
                             "${order.items![i].title!} ",
-                            style: TextStyle(fontSize: 18),
+                            style: const TextStyle(fontSize: 18),
                           ),
                         ),
                       ),
@@ -66,7 +63,8 @@ class _OrderItemState extends State<OrderItem> {
                             left: 15.0, right: 15, bottom: 3),
                         child: Text(
                           "${order.items![i].quantity}x / \$${order.items![i].price!}",
-                          style: TextStyle(fontSize: 14, color: Colors.black38),
+                          style: const TextStyle(
+                              fontSize: 14, color: Colors.black38),
                         ),
                       )
                     ],

@@ -32,7 +32,30 @@ class ProductItem extends StatelessWidget {
                 icon: product.isFavorite!
                     ? const Icon(Icons.favorite)
                     : const Icon(Icons.favorite_border),
-                onPressed: () => product.toggleFavorite(),
+                onPressed: () {
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    backgroundColor: Theme.of(context).secondaryHeaderColor,
+                    duration: const Duration(seconds: 2),
+                    content: !product.isFavorite!
+                        ? Text(
+                            "Added '${product.title!}' to favorites",
+                            textAlign: TextAlign.center,
+                          )
+                        : Text(
+                            "Removed '${product.title!}' from favorites",
+                            textAlign: TextAlign.center,
+                          ),
+                    action: SnackBarAction(
+                      textColor: Colors.orange.shade100,
+                      label: "Undo",
+                      onPressed: () {
+                        product.toggleFavorite();
+                      },
+                    ),
+                  ));
+                  product.toggleFavorite();
+                },
               ),
               backgroundColor: Colors.black54,
               title: Text(
@@ -44,6 +67,22 @@ class ProductItem extends StatelessWidget {
                 onPressed: () {
                   cart.addItem(
                       product.id!, product.price!, product.title!, product.id!);
+                  // establish connection to nearest scaffold (controls entire page) | products_overview
+                  ScaffoldMessenger.of(context).hideCurrentSnackBar();
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    backgroundColor: Theme.of(context).secondaryHeaderColor,
+                    duration: const Duration(seconds: 2),
+                    content: Text(
+                      "Added item '${product.title!}' to cart",
+                    ),
+                    action: SnackBarAction(
+                      textColor: Colors.orange.shade100,
+                      label: "Undo",
+                      onPressed: () {
+                        cart.removeSingleItem(product.id!);
+                      },
+                    ),
+                  ));
                 },
               ),
             )),

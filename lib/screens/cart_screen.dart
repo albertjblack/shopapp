@@ -57,6 +57,17 @@ class CartScreen extends StatelessWidget {
                             cart.clearCart();
                             Navigator.pushNamed(
                                 context, OrdersScreen.routeName);
+                          } else {
+                            ScaffoldMessenger.of(context).clearSnackBars();
+                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              backgroundColor:
+                                  Theme.of(context).secondaryHeaderColor,
+                              duration: const Duration(seconds: 2),
+                              content: const Text(
+                                "No items in cart yet, add some before ordering.",
+                                textAlign: TextAlign.center,
+                              ),
+                            ));
                           }
                         },
                         child: Text(
