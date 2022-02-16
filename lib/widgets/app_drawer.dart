@@ -34,7 +34,7 @@ class AppDrawer extends StatelessWidget {
         ),
         ListTile(
           leading: const Icon(Icons.person_rounded),
-          title: const Text('My Products'),
+          title: const Text('Mine'),
           onTap: () => Navigator.of(context)
               .pushReplacementNamed(UserProductsScreen.routeName),
         )
