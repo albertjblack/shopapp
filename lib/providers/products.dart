@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import './../constants/dummy_data.dart';
-import 'product.dart';
+import './product.dart';
 
 // we only want to change data from within, so notifyListeners let know all the other part that are listening
 class ProductsProvider with ChangeNotifier {
@@ -22,13 +22,23 @@ class ProductsProvider with ChangeNotifier {
     return _items.where((e) => e.isFavorite == true).toList();
   }
 
-  void addProduct() {
-    //_items.add(value);
-    // we will notify the app that the list has changed
+  void addProduct(String _action, Product _product) {
+    if (_action == "add") {
+      _items.insert(0, _product);
+    } else {
+      int _idx = _items
+          .indexOf(_items.firstWhere((element) => element.id == _product.id));
+      _items[_idx] = _product;
+    }
     notifyListeners();
   }
 
   Product getElementById(id) {
     return _items.firstWhere((element) => element.id == id);
+  }
+
+  void removeProduct(String _id) {
+    _items.removeWhere((element) => element.id == _id);
+    notifyListeners();
   }
 }
