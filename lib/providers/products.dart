@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 import './../constants/dummy_data.dart';
 import './product.dart';
@@ -22,15 +25,43 @@ class ProductsProvider with ChangeNotifier {
     return _items.where((e) => e.isFavorite == true).toList();
   }
 
-  void addProduct(String _action, Product _product) {
+  Future addProduct(String _action, Product _product) {
+    final url = Uri.https(
+        "flutter-shop-v1-default-rtdb.firebaseio.com", "/products.json");
     if (_action == "add") {
-      _items.insert(0, _product);
+      return http
+          .post(url,
+              body: json.encode({
+                "title": _product.title,
+                "description": _product.description,
+                "price": _product.price,
+                "imageUrl": _product.imageUrl,
+                "isFavorite": _product.isFavorite,
+              }))
+          .then((value) {
+        String _id = json.decode(value.body)["name"];
+        _items.insert(
+            0,
+            Product(
+              id: _id,
+              title: _product.title,
+              description: _product.description,
+              price: _product.price,
+              imageUrl: _product.imageUrl,
+              isFavorite: _product.isFavorite,
+            ));
+        notifyListeners();
+      }).catchError((e) {
+        throw e;
+      });
     } else {
       int _idx = _items
           .indexOf(_items.firstWhere((element) => element.id == _product.id));
       _items[_idx] = _product;
+      notifyListeners();
+
+      return Future.value();
     }
-    notifyListeners();
   }
 
   Product getElementById(id) {

@@ -12,7 +12,7 @@ class AppDrawer extends StatelessWidget {
         child: Column(
       children: [
         AppBar(
-          title: const Text("Hello friend"),
+          title: const Text("Hello lover!"),
           automaticallyImplyLeading: false,
         ),
         ListTile(
