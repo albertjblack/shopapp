@@ -84,35 +84,23 @@ class _EditProductScreenState extends State<EditProductScreen> {
   }
 
   // SAVE FORM
-  void _saveForm() {
+  Future _saveForm() async {
     bool isValid = _form.currentState!.validate();
+
     if (!isValid) {
       return;
     }
+
     _form.currentState!.save();
-    _isLoading = true;
+    setState(() {
+      _isLoading = true;
+    });
 
     if (_editedProduct.id != "") {
-      Provider.of<ProductsProvider>(context, listen: false)
-          .addProduct("edit", _editedProduct)
-          .then((value) {
-        setState(() {
-          _isLoading = false;
-        });
-        Navigator.of(context).pop();
-      });
-    } else {
-      _editedProduct = Product(
-          id: DateTime.now().toString(),
-          title: _editedProduct.title,
-          description: _editedProduct.description,
-          price: _editedProduct.price,
-          imageUrl: _editedProduct.imageUrl,
-          isFavorite: _editedProduct.isFavorite);
-      Provider.of<ProductsProvider>(context, listen: false)
-          .addProduct("add", _editedProduct)
-          .then((value) => Navigator.of(context).pop())
-          .catchError((e) {
+      try {
+        await Provider.of<ProductsProvider>(context, listen: false)
+            .addProduct("edit", _editedProduct);
+      } catch (e) {
         return showDialog(
             context: context,
             builder: (_) {
@@ -128,13 +116,42 @@ class _EditProductScreenState extends State<EditProductScreen> {
                 ],
               );
             });
-      }).then((_) {
-        setState(() {
-          _isLoading = false;
-        });
-        Navigator.of(context).pop();
-      });
+      }
+    } //
+
+    else {
+      _editedProduct = Product(
+          id: DateTime.now().toString(),
+          title: _editedProduct.title,
+          description: _editedProduct.description,
+          price: _editedProduct.price,
+          imageUrl: _editedProduct.imageUrl,
+          isFavorite: _editedProduct.isFavorite);
+      try {
+        await Provider.of<ProductsProvider>(context, listen: false)
+            .addProduct("add", _editedProduct);
+      } catch (e) {
+        return showDialog(
+            context: context,
+            builder: (_) {
+              return AlertDialog(
+                title: const Text("An error ocurred"),
+                content: Text(e.toString()),
+                actions: [
+                  TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text("Okay"))
+                ],
+              );
+            });
+      }
     }
+    setState(() {
+      _isLoading = false;
+    });
+    Navigator.of(context).pop();
   }
 
   // RENDERING

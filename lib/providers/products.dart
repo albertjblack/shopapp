@@ -25,21 +25,20 @@ class ProductsProvider with ChangeNotifier {
     return _items.where((e) => e.isFavorite == true).toList();
   }
 
-  Future addProduct(String _action, Product _product) {
+  Future addProduct(String _action, Product _product) async {
     final url = Uri.https(
         "flutter-shop-v1-default-rtdb.firebaseio.com", "/products.json");
     if (_action == "add") {
-      return http
-          .post(url,
-              body: json.encode({
-                "title": _product.title,
-                "description": _product.description,
-                "price": _product.price,
-                "imageUrl": _product.imageUrl,
-                "isFavorite": _product.isFavorite,
-              }))
-          .then((value) {
-        String _id = json.decode(value.body)["name"];
+      final response = await http.post(url,
+          body: json.encode({
+            "title": _product.title,
+            "description": _product.description,
+            "price": _product.price,
+            "imageUrl": _product.imageUrl,
+            "isFavorite": _product.isFavorite,
+          }));
+      try {
+        String _id = json.decode(response.body)["name"];
         _items.insert(
             0,
             Product(
@@ -51,16 +50,14 @@ class ProductsProvider with ChangeNotifier {
               isFavorite: _product.isFavorite,
             ));
         notifyListeners();
-      }).catchError((e) {
-        throw e;
-      });
+      } catch (e) {
+        rethrow;
+      }
     } else {
       int _idx = _items
           .indexOf(_items.firstWhere((element) => element.id == _product.id));
       _items[_idx] = _product;
       notifyListeners();
-
-      return Future.value();
     }
   }
 
