@@ -44,27 +44,45 @@ class UserItem extends StatelessWidget {
                 color: Theme.of(context).secondaryHeaderColor,
               )),
           IconButton(
-              onPressed: () {
-                showDialog(
-                    context: context,
-                    builder: (ctx) => AlertDialog(
-                          title: const Text("Are you sure?"),
-                          content:
-                              const Text("Do you want to remove the item?"),
+              onPressed: () async {
+                try {
+                  await showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                            title: const Text("Are you sure?"),
+                            content:
+                                const Text("Do you want to remove the item?"),
+                            actions: [
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.of(ctx).pop(true);
+                                    products.removeProduct(id!);
+                                  },
+                                  child: const Text("Yes")),
+                              TextButton(
+                                  onPressed: () {
+                                    Navigator.of(ctx).pop(false);
+                                  },
+                                  child: const Text("No"))
+                            ],
+                          ));
+                } catch (e) {
+                  await showDialog(
+                      context: context,
+                      builder: (_) {
+                        return AlertDialog(
+                          title: const Text("An error ocurred"),
+                          content: Text(e.toString()),
                           actions: [
                             TextButton(
                                 onPressed: () {
-                                  Navigator.of(ctx).pop(true);
-                                  products.removeProduct(id!);
+                                  Navigator.of(context).pop();
                                 },
-                                child: const Text("Yes")),
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.of(ctx).pop(false);
-                                },
-                                child: const Text("No"))
+                                child: const Text("Okay"))
                           ],
-                        ));
+                        );
+                      });
+                }
               },
               icon: Icon(
                 Icons.delete,

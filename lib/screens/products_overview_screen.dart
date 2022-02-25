@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import './../constants/constants.dart';
 
 import './../providers/cart.dart';
+import './../providers/products.dart';
 
 import './cart_screen.dart';
 
@@ -27,7 +28,25 @@ class ProductsOverviewScreen extends StatefulWidget {
 // state code
 
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
+  var _isInit = true;
   var _showOnlyFavs = false;
+  var _isLoading = false;
+
+  @override
+  void didChangeDependencies() {
+    if (_isInit) {
+      setState(() {
+        _isLoading = true;
+      });
+      Provider.of<ProductsProvider>(context).fetchSetProducts().then((value) {
+        setState(() {
+          _isLoading = false;
+        });
+      });
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +90,9 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
           )
         ],
       ),
-      body: ProductsGrid(showOnlyFavs: _showOnlyFavs),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ProductsGrid(showOnlyFavs: _showOnlyFavs),
       drawer: const AppDrawer(),
     );
   }

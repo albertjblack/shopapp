@@ -101,7 +101,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
         await Provider.of<ProductsProvider>(context, listen: false)
             .addProduct("edit", _editedProduct);
       } catch (e) {
-        return showDialog(
+        await showDialog(
             context: context,
             builder: (_) {
               return AlertDialog(
@@ -117,8 +117,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
               );
             });
       }
-    } //
-
+    }
+    // adding
     else {
       _editedProduct = Product(
           id: DateTime.now().toString(),
@@ -131,7 +131,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
         await Provider.of<ProductsProvider>(context, listen: false)
             .addProduct("add", _editedProduct);
       } catch (e) {
-        return showDialog(
+        await showDialog(
             context: context,
             builder: (_) {
               return AlertDialog(

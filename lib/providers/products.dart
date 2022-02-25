@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
-import './../constants/dummy_data.dart';
 import './product.dart';
 
 // we only want to change data from within, so notifyListeners let know all the other part that are listening
@@ -11,7 +10,7 @@ class ProductsProvider with ChangeNotifier {
   // changenotifier allows us to establish behind the scenes comunications with the help of context
   // we do not want to edit _items when product change
   // we want to call a method to update the _items with listeners
-  final List<Product> _items = dummyProducts;
+  List<Product> _items = [];
 
   // since the _items is private we need to add a getter
   List<Product> get items {
@@ -29,15 +28,17 @@ class ProductsProvider with ChangeNotifier {
     final url = Uri.https(
         "flutter-shop-v1-default-rtdb.firebaseio.com", "/products.json");
     if (_action == "add") {
-      final response = await http.post(url,
-          body: json.encode({
-            "title": _product.title,
-            "description": _product.description,
-            "price": _product.price,
-            "imageUrl": _product.imageUrl,
-            "isFavorite": _product.isFavorite,
-          }));
       try {
+        // req
+        final response = await http.post(url,
+            body: json.encode({
+              "title": _product.title,
+              "description": _product.description,
+              "price": _product.price,
+              "imageUrl": _product.imageUrl,
+              "isFavorite": _product.isFavorite,
+            }));
+        // local
         String _id = json.decode(response.body)["name"];
         _items.insert(
             0,
@@ -53,11 +54,29 @@ class ProductsProvider with ChangeNotifier {
       } catch (e) {
         rethrow;
       }
-    } else {
-      int _idx = _items
-          .indexOf(_items.firstWhere((element) => element.id == _product.id));
-      _items[_idx] = _product;
-      notifyListeners();
+    }
+    // updating products
+    else {
+      try {
+        final url = Uri.https("flutter-shop-v1-default-rtdb.firebaseio.com",
+            "/products/${_product.id}.json");
+
+        await http.patch(url,
+            body: json.encode({
+              "title": _product.title,
+              "description": _product.description,
+              "price": _product.price,
+              "imageUrl": _product.imageUrl,
+              // "isFavorite": _product.isFavorite,
+            }));
+
+        int _idx = _items
+            .indexOf(_items.firstWhere((element) => element.id == _product.id));
+        _items[_idx] = _product;
+        notifyListeners();
+      } catch (e) {
+        rethrow;
+      }
     }
   }
 
@@ -65,8 +84,54 @@ class ProductsProvider with ChangeNotifier {
     return _items.firstWhere((element) => element.id == id);
   }
 
+  Future fetchSetProducts() async {
+    final url = Uri.https(
+        "flutter-shop-v1-default-rtdb.firebaseio.com", "/products.json");
+
+    // trying
+    try {
+      final response = await http.get(url);
+      final decodedMap = json.decode(response.body) as Map<String, dynamic>;
+      List<Product> _temp = [];
+      // decoded
+      decodedMap.forEach((productId, productData) {
+        // temp prod
+        var _p = Product(
+            id: productId,
+            title: productData["title"],
+            description: productData["description"],
+            imageUrl: productData["imageUrl"],
+            price: productData["price"],
+            isFavorite: productData["isFavorite"]);
+        _temp.add(_p);
+      });
+
+      _items = _temp;
+      // notify try
+      notifyListeners();
+    }
+
+    // catching
+    catch (e) {
+      rethrow;
+    }
+  }
+
   void removeProduct(String _id) {
-    _items.removeWhere((element) => element.id == _id);
-    notifyListeners();
+    try {
+      final url = Uri.https(
+          "flutter-shop-v1-default-rtdb.firebaseio.com", "/products/$_id.json");
+      final _idx = _items.indexWhere((element) => element.id == _id);
+      Product? _prod = _items[_idx];
+      _items.removeAt(_idx);
+      notifyListeners();
+      http.delete(url).then((_) {
+        _prod = null;
+      }).catchError((_) {
+        _items.insert(_idx, _prod!);
+      });
+    } catch (e) {
+      rethrow;
+    }
   }
 }
