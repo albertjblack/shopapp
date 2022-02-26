@@ -33,6 +33,7 @@ class ProductItem extends StatelessWidget {
                     ? const Icon(Icons.favorite)
                     : const Icon(Icons.favorite_border),
                 onPressed: () {
+                  // part 1
                   ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     backgroundColor: Theme.of(context).secondaryHeaderColor,
@@ -54,6 +55,7 @@ class ProductItem extends StatelessWidget {
                       },
                     ),
                   ));
+                  // part 2
                   product.toggleFavorite();
                 },
               ),

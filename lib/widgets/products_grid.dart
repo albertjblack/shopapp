@@ -11,6 +11,8 @@ class ProductsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final productsData = Provider.of<ProductsProvider>(context);
+
+    // dealing with favorite filter bool passed from the overview screen
     final loadedProducts =
         showOnlyFavs! ? productsData.favs : productsData.items;
 
