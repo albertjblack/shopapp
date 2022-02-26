@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import './product.dart';
+import './../models/http_exception.dart';
 
 // we only want to change data from within, so notifyListeners let know all the other part that are listening
 class ProductsProvider with ChangeNotifier {
@@ -117,19 +118,18 @@ class ProductsProvider with ChangeNotifier {
     }
   }
 
-  void removeProduct(String _id) {
+  Future<void> removeProduct(String _id) async {
     try {
       final url = Uri.https(
           "flutter-shop-v1-default-rtdb.firebaseio.com", "/products/$_id.json");
-      final _idx = _items.indexWhere((element) => element.id == _id);
-      Product? _prod = _items[_idx];
-      _items.removeAt(_idx);
+      final response = await http.delete(url);
+      if (response.statusCode >= 400) {
+        throw HttpException("Could not delete product, try again later.");
+      }
+      _items.removeWhere(
+        (element) => element.id == _id,
+      );
       notifyListeners();
-      http.delete(url).then((_) {
-        _prod = null;
-      }).catchError((_) {
-        _items.insert(_idx, _prod!);
-      });
     } catch (e) {
       rethrow;
     }

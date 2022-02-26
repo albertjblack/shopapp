@@ -19,7 +19,7 @@ class UserItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final products = Provider.of<ProductsProvider>(context);
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
     return ListTile(
       title: SizedBox(
         child: Text(
@@ -45,44 +45,41 @@ class UserItem extends StatelessWidget {
               )),
           IconButton(
               onPressed: () async {
-                try {
-                  await showDialog(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                            title: const Text("Are you sure?"),
-                            content:
-                                const Text("Do you want to remove the item?"),
-                            actions: [
-                              TextButton(
-                                  onPressed: () {
-                                    Navigator.of(ctx).pop(true);
-                                    products.removeProduct(id!);
-                                  },
-                                  child: const Text("Yes")),
-                              TextButton(
-                                  onPressed: () {
-                                    Navigator.of(ctx).pop(false);
-                                  },
-                                  child: const Text("No"))
-                            ],
-                          ));
-                } catch (e) {
-                  await showDialog(
-                      context: context,
-                      builder: (_) {
-                        return AlertDialog(
-                          title: const Text("An error ocurred"),
-                          content: Text(e.toString()),
+                return showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                          title: const Text("Are you sure?"),
+                          content:
+                              const Text("Do you want to remove the item?"),
                           actions: [
                             TextButton(
-                                onPressed: () {
-                                  Navigator.of(context).pop();
+                                onPressed: () async {
+                                  Navigator.of(ctx).pop(true);
+                                  try {
+                                    await Provider.of<ProductsProvider>(context,
+                                            listen: false)
+                                        .removeProduct(id!);
+                                  } catch (e) {
+                                    scaffoldMessenger.clearSnackBars();
+                                    scaffoldMessenger.showSnackBar(SnackBar(
+                                      backgroundColor: Theme.of(context)
+                                          .secondaryHeaderColor,
+                                      duration: const Duration(seconds: 2),
+                                      content: const Text(
+                                        "Failed to delete, try again later.",
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ));
+                                  }
                                 },
-                                child: const Text("Okay"))
+                                child: const Text("Yes")),
+                            TextButton(
+                                onPressed: () {
+                                  Navigator.of(ctx).pop(false);
+                                },
+                                child: const Text("No"))
                           ],
-                        );
-                      });
-                }
+                        ));
               },
               icon: Icon(
                 Icons.delete,
