@@ -32,7 +32,7 @@ class ProductItem extends StatelessWidget {
                 icon: product.isFavorite!
                     ? const Icon(Icons.favorite)
                     : const Icon(Icons.favorite_border),
-                onPressed: () {
+                onPressed: () async {
                   // part 1
                   ScaffoldMessenger.of(context).hideCurrentSnackBar();
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -50,13 +50,36 @@ class ProductItem extends StatelessWidget {
                     action: SnackBarAction(
                       textColor: Colors.orange.shade100,
                       label: "Undo",
-                      onPressed: () {
-                        product.toggleFavorite();
+                      onPressed: () async {
+                        try {
+                          await product.toggleFavorite();
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).clearSnackBars();
+                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                              backgroundColor:
+                                  Theme.of(context).secondaryHeaderColor,
+                              duration: const Duration(seconds: 2),
+                              content: const Text(
+                                "Failed to toggle favorite, please try again.",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(),
+                              )));
+                        }
                       },
                     ),
                   ));
                   // part 2
-                  product.toggleFavorite();
+                  try {
+                    await product.toggleFavorite();
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).clearSnackBars();
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                        backgroundColor: Theme.of(context).secondaryHeaderColor,
+                        duration: const Duration(seconds: 2),
+                        content: const Text(
+                            "Failed to toggle favorite, please try again.",
+                            textAlign: TextAlign.center)));
+                  }
                 },
               ),
               backgroundColor: Colors.black54,

@@ -92,7 +92,10 @@ class ProductsProvider with ChangeNotifier {
     // trying
     try {
       final response = await http.get(url);
-      final decodedMap = json.decode(response.body) as Map<String, dynamic>;
+      final decodedMap = json.decode(response.body) as Map<String, dynamic>?;
+      if (decodedMap == null) {
+        return;
+      }
       List<Product> _temp = [];
       // decoded
       decodedMap.forEach((productId, productData) {

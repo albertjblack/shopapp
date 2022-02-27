@@ -9,9 +9,16 @@ import './orders_screen.dart';
 import './../widgets/cart_item.dart';
 import './../widgets/app_drawer.dart';
 
-class CartScreen extends StatelessWidget {
+class CartScreen extends StatefulWidget {
   const CartScreen({Key? key}) : super(key: key);
   static const routeName = "/cart";
+
+  @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  var _orderProcessing = false;
 
   @override
   Widget build(BuildContext context) {
@@ -48,33 +55,70 @@ class CartScreen extends StatelessWidget {
                                 .color),
                       ),
                       backgroundColor: Theme.of(context).primaryColor,
-                    ), // a little bit like our badge widget
-                    TextButton(
-                        onPressed: () {
-                          if (cart.totalSum > 0) {
-                            orders.addOrder(
-                                cart.items.values.toList(), cart.totalSum);
-                            cart.clearCart();
-                            Navigator.pushNamed(
-                                context, OrdersScreen.routeName);
-                          } else {
-                            ScaffoldMessenger.of(context).clearSnackBars();
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                              backgroundColor:
-                                  Theme.of(context).secondaryHeaderColor,
-                              duration: const Duration(seconds: 2),
-                              content: const Text(
-                                "No items in cart yet, add some before ordering.",
-                                textAlign: TextAlign.center,
-                              ),
-                            ));
-                          }
-                        },
-                        child: Text(
-                          "Order now",
-                          style:
-                              TextStyle(color: Theme.of(context).primaryColor),
-                        ))
+                    ),
+                    _orderProcessing
+                        ? const CircularProgressIndicator()
+                        : // a little bit like our badge widget
+                        cart.totalSum <= 0
+                            ? Text(
+                                "Order now",
+                                style: TextStyle(
+                                    color:
+                                        Theme.of(context).secondaryHeaderColor),
+                              )
+                            : TextButton(
+                                onPressed: () async {
+                                  setState(() {
+                                    _orderProcessing = true;
+                                  });
+                                  if (cart.totalSum > 0) {
+                                    try {
+                                      await orders.addOrder(
+                                          cart.items.values.toList(),
+                                          cart.totalSum);
+                                      cart.clearCart();
+                                      Navigator.pushNamed(
+                                          context, OrdersScreen.routeName);
+                                      setState(() {
+                                        _orderProcessing = false;
+                                      });
+                                    } catch (e) {
+                                      setState(() {
+                                        _orderProcessing = false;
+                                      });
+                                      ScaffoldMessenger.of(context)
+                                          .clearSnackBars();
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(
+                                        backgroundColor: Theme.of(context)
+                                            .secondaryHeaderColor,
+                                        duration: const Duration(seconds: 2),
+                                        content: const Text(
+                                          "Failed to add order, please try again.",
+                                          textAlign: TextAlign.center,
+                                        ),
+                                      ));
+                                    }
+                                  } else {
+                                    ScaffoldMessenger.of(context)
+                                        .clearSnackBars();
+                                    ScaffoldMessenger.of(context)
+                                        .showSnackBar(SnackBar(
+                                      backgroundColor: Theme.of(context)
+                                          .secondaryHeaderColor,
+                                      duration: const Duration(seconds: 2),
+                                      content: const Text(
+                                        "No items in cart yet, add some before ordering.",
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ));
+                                  }
+                                },
+                                child: Text(
+                                  "Order now",
+                                  style: TextStyle(
+                                      color: Theme.of(context).primaryColor),
+                                ))
                   ],
                 ),
               )),
