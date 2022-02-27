@@ -8,7 +8,6 @@ import './../widgets/app_drawer.dart';
 
 class OrdersScreen extends StatefulWidget {
   static const routeName = '/orders';
-
   const OrdersScreen({Key? key}) : super(key: key);
 
   @override
@@ -16,36 +15,44 @@ class OrdersScreen extends StatefulWidget {
 }
 
 class _OrdersScreenState extends State<OrdersScreen> {
-  var _isInit = true;
-  var _isLoading = false;
+  Future? _ordersFuture;
+  Future _obtainOrdersFuture() {
+    return Provider.of<Orders>(context, listen: false).fetchSetOrders();
+  }
 
   @override
-  void didChangeDependencies() {
-    if (_isInit) {
-      setState(() {
-        _isLoading = true;
-      });
-      Provider.of<Orders>(context).fetchSetOrders().then((_) {
-        setState(() {
-          _isLoading = false;
-        });
-      });
-    }
-    _isInit = false;
-    super.didChangeDependencies();
+  void initState() {
+    _ordersFuture = _obtainOrdersFuture();
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final orders = Provider.of<Orders>(context);
     return Scaffold(
       appBar: AppBar(title: const Text('My Orders')),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-              itemCount: orders.orders.length,
-              itemBuilder: (ctx, i) => OrderItem(ordItem: orders.orders[i]),
-            ),
+      body: FutureBuilder(
+          future: _ordersFuture!,
+          builder: (ctx, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            } else {
+              if (snapshot.error != null) {
+                return const Center(
+                  child: Text(
+                      "Errow occurred while loading your orders, please try again."),
+                );
+              } else {
+                return Consumer<Orders>(
+                    builder: (ctx, orders, child) => ListView.builder(
+                          itemCount: orders.orders.length,
+                          itemBuilder: (ctx, i) =>
+                              OrderItem(ordItem: orders.orders[i]),
+                        ));
+              }
+            }
+          }),
       drawer: const AppDrawer(),
     );
   }
