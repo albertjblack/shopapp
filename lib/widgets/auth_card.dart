@@ -1,3 +1,5 @@
+import 'package:provider/provider.dart';
+import './../providers/auth.dart';
 import 'package:flutter/material.dart';
 
 enum AuthMode { signup, login }
@@ -25,7 +27,7 @@ class _AuthCardState extends State<AuthCard> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     // if cannot validate (err)
     if (!_formKey.currentState!.validate()) {
       return;
@@ -39,11 +41,13 @@ class _AuthCardState extends State<AuthCard> {
 
     // log user logic
     if (_authMode == AuthMode.login) {
-      //
+      await Provider.of<Auth>(context, listen: false)
+          .login(_authData["email"]!, _authData["password"]!);
     }
     // sign up user logic
     else {
-      //
+      await Provider.of<Auth>(context, listen: false)
+          .signup(_authData["email"]!, _authData["password"]!);
     }
 
     setState(() {
@@ -71,7 +75,7 @@ class _AuthCardState extends State<AuthCard> {
       color: Colors.white.withOpacity(0.95),
       elevation: 8,
       child: Container(
-        height: _authMode == AuthMode.signup ? 360 : 300,
+        height: _authMode == AuthMode.signup ? 382 : 300,
         width: deviceSize.width * 0.75,
         padding: const EdgeInsets.all(16),
         child: Form(
