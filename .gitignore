@@ -44,3 +44,5 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+assets/Images/Logo/nerit_logo_white.png
+assets/Images/Logo/nerit_n_white.png
