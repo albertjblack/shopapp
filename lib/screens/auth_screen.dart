@@ -68,13 +68,7 @@ class AuthScreen extends StatelessWidget {
                   ]),
             ),
           ),
-          // Center(
-          //   child: SizedBox(
-          //       width: 136,
-          //       // child: Image.asset("assets/images/logo/**_n_white.png")),
-          // ),
           Column(mainAxisAlignment: MainAxisAlignment.end, children: const [
-            // Center(child: Text("from", style: TextStyle(color: Colors.white))),
             Center(
                 child: Text("Technologies L.L.C.",
                     style: TextStyle(color: Colors.white, fontFamily: "Lato"))),

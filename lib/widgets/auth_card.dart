@@ -1,6 +1,7 @@
 import 'package:provider/provider.dart';
 import './../providers/auth.dart';
 import 'package:flutter/material.dart';
+import './../models/http_exception.dart';
 
 enum AuthMode { signup, login }
 
@@ -27,6 +28,22 @@ class _AuthCardState extends State<AuthCard> {
     super.dispose();
   }
 
+  void _showErrorDialog(String message) {
+    showDialog(
+        context: context,
+        builder: (ctx) => AlertDialog(
+              title: const Text("Error"),
+              content: Text(message),
+              actions: [
+                TextButton(
+                    child: const Text("Okay"),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    })
+              ],
+            ));
+  }
+
   Future<void> _submit() async {
     // if cannot validate (err)
     if (!_formKey.currentState!.validate()) {
@@ -39,17 +56,38 @@ class _AuthCardState extends State<AuthCard> {
       _isLoading = true;
     });
 
-    // log user logic
-    if (_authMode == AuthMode.login) {
-      await Provider.of<Auth>(context, listen: false)
-          .login(_authData["email"]!, _authData["password"]!);
-    }
-    // sign up user logic
-    else {
-      await Provider.of<Auth>(context, listen: false)
-          .signup(_authData["email"]!, _authData["password"]!);
+    try {
+      // log user logic
+      if (_authMode == AuthMode.login) {
+        await Provider.of<Auth>(context, listen: false)
+            .login(_authData["email"]!, _authData["password"]!);
+      }
+      // sign up user logic
+      else {
+        await Provider.of<Auth>(context, listen: false)
+            .signup(_authData["email"]!, _authData["password"]!);
+      }
+    } on HttpException catch (e) {
+      var errorMessage = "Authentication failed.";
+      if (e.toString().contains("EMAIL_EXISTS")) {
+        errorMessage = "This email address is already in use.";
+      } else if (e.toString().contains("INVALID_EMAIL")) {
+        errorMessage = "This email is an invalid address.";
+      } else if (e.toString().contains("WEAK_PASSWORD")) {
+        errorMessage = "This password is not strong enough.";
+      } else if (e.toString().contains("EMAIL_NOT_FOUND")) {
+        errorMessage = "This email is not registered.";
+      } else if (e.toString().contains("INVALID_PASSWORD")) {
+        errorMessage = "Ivalid password.";
+      }
+      _showErrorDialog(errorMessage);
+    } catch (e) {
+      const errorMessage = "Could not authenticate, please try again later.";
+      _showErrorDialog(errorMessage);
+      rethrow;
     }
 
+    //
     setState(() {
       _isLoading = false;
     });
@@ -106,7 +144,7 @@ class _AuthCardState extends State<AuthCard> {
                   if (value!.isEmpty || value.length < 5) {
                     return 'Password is too short!';
                   }
-                  return '';
+                  return null;
                 },
                 onSaved: (value) {
                   _authData['password'] = value!;
@@ -123,7 +161,7 @@ class _AuthCardState extends State<AuthCard> {
                           if (value != _passwordController.text) {
                             return "Passwords do not match!";
                           }
-                          return "";
+                          return null;
                         }
                       : null,
                 ),
