@@ -21,6 +21,13 @@ class Auth with ChangeNotifier {
     return null;
   }
 
+  String? get userId {
+    if (_token != null) {
+      return _userId;
+    }
+    return null;
+  }
+
   final api1 = "AIzaSyAvVibt6BUjNDP52S1YWacGm3N30pxXYdI";
   final api2 = "AIzaSyC13spCwP_f_SalxEbkB-wjedoF8iYENlQ";
   Future<void> _authenticate(

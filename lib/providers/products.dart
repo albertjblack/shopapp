@@ -8,10 +8,14 @@ import './../models/http_exception.dart';
 
 // we only want to change data from within, so notifyListeners let know all the other part that are listening
 class ProductsProvider with ChangeNotifier {
+  final String? authToken;
+  final String? userId;
+  List _items = [];
+  ProductsProvider(this.authToken, this.userId, this._items);
+
   // changenotifier allows us to establish behind the scenes comunications with the help of context
   // we do not want to edit _items when product change
   // we want to call a method to update the _items with listeners
-  List<Product> _items = [];
 
   // since the _items is private we need to add a getter
   List<Product> get items {
@@ -22,12 +26,12 @@ class ProductsProvider with ChangeNotifier {
   }
 
   List<Product> get favs {
-    return _items.where((e) => e.isFavorite == true).toList();
+    return _items.where((e) => e.isFavorite == true).toList() as List<Product>;
   }
 
   Future addProduct(String _action, Product _product) async {
-    final url = Uri.https(
-        "flutter-shop-v1-default-rtdb.firebaseio.com", "/products.json");
+    final url = Uri.https("flutter-shop-v1-default-rtdb.firebaseio.com",
+        "/products.json", {"auth": authToken});
     if (_action == "add") {
       try {
         // req
@@ -60,7 +64,7 @@ class ProductsProvider with ChangeNotifier {
     else {
       try {
         final url = Uri.https("flutter-shop-v1-default-rtdb.firebaseio.com",
-            "/products/${_product.id}.json");
+            "/products/${_product.id}.json", {"auth": authToken});
 
         await http.patch(url,
             body: json.encode({
@@ -86,13 +90,13 @@ class ProductsProvider with ChangeNotifier {
   }
 
   Future fetchSetProducts() async {
-    final url = Uri.https(
-        "flutter-shop-v1-default-rtdb.firebaseio.com", "/products.json");
+    final url = Uri.https("flutter-shop-v1-default-rtdb.firebaseio.com",
+        "/products.json", {"auth": authToken});
 
     // trying
     try {
       final response = await http.get(url);
-      final decodedMap = json.decode(response.body) as Map<String, dynamic>?;
+      final decodedMap = json.decode(response.body) as Map?;
       if (decodedMap == null) {
         return;
       }
@@ -123,8 +127,8 @@ class ProductsProvider with ChangeNotifier {
 
   Future<void> removeProduct(String _id) async {
     try {
-      final url = Uri.https(
-          "flutter-shop-v1-default-rtdb.firebaseio.com", "/products/$_id.json");
+      final url = Uri.https("flutter-shop-v1-default-rtdb.firebaseio.com",
+          "/products/$_id.json", {"auth": authToken});
       final response = await http.delete(url);
       if (response.statusCode >= 400) {
         throw HttpException("Could not delete product, try again later.");
