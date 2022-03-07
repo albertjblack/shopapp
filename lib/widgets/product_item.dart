@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '.././providers/auth.dart';
 
 import './../screens/product_detail_screen.dart';
 import '../providers/product.dart';
@@ -52,7 +53,10 @@ class ProductItem extends StatelessWidget {
                       label: "Undo",
                       onPressed: () async {
                         try {
-                          await product.toggleFavorite();
+                          await product.toggleFavorite(
+                              Provider.of<Auth>(context, listen: false).token!,
+                              Provider.of<Auth>(context, listen: false)
+                                  .userId!);
                         } catch (e) {
                           ScaffoldMessenger.of(context).clearSnackBars();
                           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -70,8 +74,11 @@ class ProductItem extends StatelessWidget {
                   ));
                   // part 2
                   try {
-                    await product.toggleFavorite();
+                    await product.toggleFavorite(
+                        Provider.of<Auth>(context, listen: false).token!,
+                        Provider.of<Auth>(context, listen: false).userId!);
                   } catch (e) {
+                    debugPrint(e.toString());
                     ScaffoldMessenger.of(context).clearSnackBars();
                     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                         backgroundColor: Theme.of(context).secondaryHeaderColor,

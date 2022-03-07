@@ -22,12 +22,11 @@ class Product with ChangeNotifier {
       @required this.imageUrl,
       this.isFavorite = false});
 
-  Future<void> toggleFavorite() async {
+  Future<void> toggleFavorite(String token, String userId) async {
     try {
       final url = Uri.https("flutter-shop-v1-default-rtdb.firebaseio.com",
-          "/products/${id!}.json");
-      final response = await http.patch(url,
-          body: json.encode({"isFavorite": !isFavorite!}));
+          "/favorites/$userId/$id.json", {"auth": token});
+      final response = await http.put(url, body: json.encode(!isFavorite!));
       if (response.statusCode >= 400) {
         throw HttpException("Failed to toggle favorite, please try again.");
       }

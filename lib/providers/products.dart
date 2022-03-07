@@ -41,7 +41,6 @@ class ProductsProvider with ChangeNotifier {
               "description": _product.description,
               "price": _product.price,
               "imageUrl": _product.imageUrl,
-              "isFavorite": _product.isFavorite,
             }));
         // local
         String _id = json.decode(response.body)["name"];
@@ -93,6 +92,9 @@ class ProductsProvider with ChangeNotifier {
     final url = Uri.https("flutter-shop-v1-default-rtdb.firebaseio.com",
         "/products.json", {"auth": authToken});
 
+    final favsUrl = Uri.https("flutter-shop-v1-default-rtdb.firebaseio.com",
+        "/favorites/$userId.json", {"auth": authToken});
+
     // trying
     try {
       final response = await http.get(url);
@@ -100,6 +102,8 @@ class ProductsProvider with ChangeNotifier {
       if (decodedMap == null) {
         return;
       }
+      final favsResponse = await http.get(favsUrl);
+      final favsData = json.decode(favsResponse.body);
       List<Product> _temp = [];
       // decoded
       decodedMap.forEach((productId, productData) {
@@ -110,7 +114,8 @@ class ProductsProvider with ChangeNotifier {
             description: productData["description"],
             imageUrl: productData["imageUrl"],
             price: productData["price"],
-            isFavorite: productData["isFavorite"]);
+            isFavorite:
+                favsData == null ? false : favsData[productId] ?? false);
         _temp.add(_p);
       });
 

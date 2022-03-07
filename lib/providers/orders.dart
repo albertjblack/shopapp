@@ -23,19 +23,22 @@ class MyOrderItem {
 /* ORDERS */
 
 class Orders with ChangeNotifier {
-  List<MyOrderItem> _orders = [];
+  final String? authToken;
+  final String? userId;
+  Orders(this.authToken, this.userId, this._orders);
+  List<MyOrderItem>? _orders = [];
 
   // getters
   List<MyOrderItem> get orders {
-    return [..._orders];
+    return [..._orders!];
   }
 
   // methods
   Future fetchSetOrders() async {
     try {
       List<MyOrderItem> _temp = [];
-      final url = Uri.https(
-          "flutter-shop-v1-default-rtdb.firebaseio.com", "/orders.json");
+      final url = Uri.https("flutter-shop-v1-default-rtdb.firebaseio.com",
+          "/orders.json", {"auth": authToken});
       final response = await http.get(url);
       final decodedMap = json.decode(response.body) as Map<String, dynamic>?;
       if (decodedMap == null) {
@@ -68,8 +71,8 @@ class Orders with ChangeNotifier {
   Future addOrder(List<MyCartItem> cartItems, double total) async {
     try {
       final _dateTime = DateTime.now();
-      final url = Uri.https(
-          "flutter-shop-v1-default-rtdb.firebaseio.com", "/orders.json");
+      final url = Uri.https("flutter-shop-v1-default-rtdb.firebaseio.com",
+          "/orders/$userId.json", {"auth": authToken});
       final response = await http.post(url,
           body: json.encode({
             "amount": total,
@@ -88,7 +91,7 @@ class Orders with ChangeNotifier {
       // add all the content of the cart in 1 order
       String _id = json.decode(response.body)["name"];
 
-      _orders.insert(
+      _orders!.insert(
           0,
           MyOrderItem(
               id: _id, amount: total, items: cartItems, dateTime: _dateTime));
