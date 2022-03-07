@@ -20,7 +20,6 @@ class UserProductsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    debugPrint('rebuilding...');
     return Scaffold(
       appBar: AppBar(
         title: const Text('Your Products'),

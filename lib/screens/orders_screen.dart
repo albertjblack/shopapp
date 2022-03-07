@@ -41,7 +41,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
               if (snapshot.error != null) {
                 return const Center(
                   child: Text(
-                      "Errow occurred while loading your orders, please try again."),
+                      "Error occurred while loading your orders, please try again."),
                 );
               } else {
                 return Consumer<Orders>(

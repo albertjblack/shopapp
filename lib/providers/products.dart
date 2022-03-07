@@ -92,22 +92,28 @@ class ProductsProvider with ChangeNotifier {
   Future fetchSetProducts([bool filterByUser = false]) async {
     final url = Uri.https("flutter-shop-v1-default-rtdb.firebaseio.com",
         "/products.json", {"auth": authToken});
-    final filteredUrl = Uri.https(
-        "flutter-shop-v1-default-rtdb.firebaseio.com",
-        "/products.json",
-        {"auth": authToken, "orderBy": "creatorId", "equalTo": "$userId"});
+    final filteredUrl = Uri.parse(
+        'https://flutter-shop-v1-default-rtdb.firebaseio.com/products.json?auth=$authToken&orderBy="creatorId"&equalTo="$userId"');
+
     final favsUrl = Uri.https("flutter-shop-v1-default-rtdb.firebaseio.com",
         "/favorites/$userId.json", {"auth": authToken});
 
     final _url = filterByUser ? filteredUrl : url;
+
     // trying
     try {
       final response = await http.get(_url);
       final decodedMap = json.decode(response.body);
+
       if (decodedMap == null || decodedMap["error"] != null) {
+        return;
+      }
+
+      if (filterByUser && !decodedMap.toString().contains(userId!)) {
         _items = [];
         return;
       }
+
       final favsResponse = await http.get(favsUrl);
       final favsData = json.decode(favsResponse.body);
       List<Product> _temp = [];

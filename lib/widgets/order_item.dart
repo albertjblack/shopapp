@@ -28,7 +28,7 @@ class _OrderItemState extends State<OrderItem> {
       margin: const EdgeInsets.all(10),
       child: Column(children: [
         ListTile(
-          title: Text('\$${order.amount}'),
+          title: Text('\$${order.amount!.toStringAsFixed(2)}'),
           subtitle: Text(DateFormat('dd/MM/yyyy').format(order.dateTime!)),
           trailing: IconButton(
             icon: Icon(isExpaned ? Icons.expand_less : Icons.expand_more),
@@ -62,7 +62,7 @@ class _OrderItemState extends State<OrderItem> {
                         padding: const EdgeInsets.only(
                             left: 15.0, right: 15, bottom: 3),
                         child: Text(
-                          "${order.items![i].quantity}x / \$${order.items![i].price!}",
+                          "${order.items![i].quantity}x / \$${order.items![i].price!.toStringAsFixed(2)}",
                           style: const TextStyle(
                               fontSize: 14, color: Colors.black38),
                         ),

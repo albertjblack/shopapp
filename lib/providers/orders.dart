@@ -35,10 +35,10 @@ class Orders with ChangeNotifier {
 
   // methods
   Future fetchSetOrders() async {
+    List<MyOrderItem> _temp = [];
+    final url = Uri.https("flutter-shop-v1-default-rtdb.firebaseio.com",
+        "/orders/$userId.json", {"auth": authToken});
     try {
-      List<MyOrderItem> _temp = [];
-      final url = Uri.https("flutter-shop-v1-default-rtdb.firebaseio.com",
-          "/orders.json", {"auth": authToken});
       final response = await http.get(url);
       final decodedMap = json.decode(response.body) as Map<String, dynamic>?;
       if (decodedMap == null) {
@@ -48,12 +48,12 @@ class Orders with ChangeNotifier {
         List<MyCartItem> _orderItems = [];
         var _orderItemsItem = orderData["items"] as List;
         for (Map e in _orderItemsItem) {
-          MyCartItem(
+          _orderItems.add(MyCartItem(
               id: e["id"],
               title: e["title"],
               quantity: e["quantity"],
               price: e["price"],
-              productId: e["productId"]);
+              productId: e["productId"]));
         }
         _temp.add(MyOrderItem(
             id: orderId,
@@ -69,10 +69,11 @@ class Orders with ChangeNotifier {
   }
 
   Future addOrder(List<MyCartItem> cartItems, double total) async {
+    final _dateTime = DateTime.now();
+    final url = Uri.https("flutter-shop-v1-default-rtdb.firebaseio.com",
+        "/orders/$userId.json", {"auth": authToken});
+
     try {
-      final _dateTime = DateTime.now();
-      final url = Uri.https("flutter-shop-v1-default-rtdb.firebaseio.com",
-          "/orders/$userId.json", {"auth": authToken});
       final response = await http.post(url,
           body: json.encode({
             "amount": total,
@@ -82,12 +83,13 @@ class Orders with ChangeNotifier {
                       "id": e.id,
                       "title": e.title,
                       "quantity": e.quantity,
-                      "price": e.price,
+                      "price": double.parse(e.price!.toStringAsPrecision(2)),
                       "productId": e.productId
                     })
                 .toList(),
             "dateTime": _dateTime.toIso8601String()
           }));
+      debugPrint(response.body.toString());
       // add all the content of the cart in 1 order
       String _id = json.decode(response.body)["name"];
 

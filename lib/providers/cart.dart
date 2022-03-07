@@ -87,7 +87,8 @@ class Cart with ChangeNotifier {
               id: existing.id,
               title: existing.title,
               quantity: existing.quantity! - 1,
-              price: existing.price!,
+              price: (existing.price! / existing.quantity!) *
+                  (existing.quantity! - 1),
               productId: _productId));
     } else {
       removeItem(_productId);
