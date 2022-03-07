@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import './../models/http_exception.dart';
@@ -7,6 +9,7 @@ class Auth with ChangeNotifier {
   String? _token;
   DateTime? _expiryDate;
   String? _userId;
+  Timer? _authTImer;
 
   bool get isAuth {
     return !(token == null);
@@ -53,6 +56,7 @@ class Auth with ChangeNotifier {
       _userId = responseData["localId"];
       _expiryDate = DateTime.now()
           .add(Duration(seconds: int.parse(responseData["expiresIn"])));
+      _autoLogout();
       notifyListeners();
     } catch (e) {
       // firebase direct error, but not error related to our email error
@@ -67,5 +71,24 @@ class Auth with ChangeNotifier {
 
   Future<void> signup(String email, String password) {
     return _authenticate(email, password, "signupNewUser");
+  }
+
+  void logout() {
+    _token = null;
+    _expiryDate = null;
+    _userId = null;
+    if (_authTImer != null) {
+      _authTImer!.cancel();
+      _authTImer = null;
+    }
+    notifyListeners();
+  }
+
+  void _autoLogout() {
+    if (_authTImer != null) {
+      _authTImer!.cancel();
+    }
+    final timeToExpiry = _expiryDate!.difference(DateTime.now()).inSeconds;
+    _authTImer = Timer(Duration(seconds: timeToExpiry), logout);
   }
 }
