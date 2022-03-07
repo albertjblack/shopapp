@@ -52,9 +52,14 @@ class MyApp extends StatelessWidget {
               secondaryHeaderColor: Color(secondaryColor),
               fontFamily: 'Lato'),
           routes: {
-            '/': (context) => auth.isAuth
-                ? const ProductsOverviewScreen()
-                : const AuthScreen(),
+            '/': (context) => FutureBuilder(
+                future: auth.successAutoLogin(),
+                builder: (_, snapshot) =>
+                    snapshot.connectionState == ConnectionState.waiting
+                        ? const Center(child: CircularProgressIndicator())
+                        : snapshot.data == false
+                            ? const AuthScreen()
+                            : const ProductsOverviewScreen()),
             ProductDetailScreen.routeName: (ctx) => const ProductDetailScreen(),
             CartScreen.routeName: (ctx) => const CartScreen(),
             OrdersScreen.routeName: (ctx) => const OrdersScreen(),

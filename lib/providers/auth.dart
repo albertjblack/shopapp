@@ -3,6 +3,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+
 import './../models/http_exception.dart';
 
 class Auth with ChangeNotifier {
@@ -58,6 +60,13 @@ class Auth with ChangeNotifier {
           .add(Duration(seconds: int.parse(responseData["expiresIn"])));
       _autoLogout();
       notifyListeners();
+      final prefs = await SharedPreferences.getInstance();
+      final userData = json.encode({
+        "token": _token,
+        "userId": _userId,
+        "expiryDate": _expiryDate!.toIso8601String()
+      });
+      prefs.setString("userData", userData);
     } catch (e) {
       // firebase direct error, but not error related to our email error
       debugPrint(e.toString());
@@ -73,13 +82,19 @@ class Auth with ChangeNotifier {
     return _authenticate(email, password, "signupNewUser");
   }
 
-  void logout() {
+  void logout() async {
     _token = null;
     _expiryDate = null;
     _userId = null;
     if (_authTImer != null) {
       _authTImer!.cancel();
       _authTImer = null;
+    }
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      prefs.remove("userData");
+    } catch (e) {
+      debugPrint("userData has not been defined.");
     }
     notifyListeners();
   }
@@ -90,5 +105,25 @@ class Auth with ChangeNotifier {
     }
     final timeToExpiry = _expiryDate!.difference(DateTime.now()).inSeconds;
     _authTImer = Timer(Duration(seconds: timeToExpiry), logout);
+  }
+
+  Future<bool> successAutoLogin() async {
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey("userData")) {
+      return false;
+    }
+    final recoveredData = json.decode(prefs.getString("userData")!);
+    final expiryDate = DateTime.parse(recoveredData["expiryDate"]);
+    if (expiryDate.isBefore(DateTime.now())) {
+      return false;
+    }
+
+    _token = recoveredData["token"];
+    _userId = recoveredData["userId"];
+    _expiryDate = expiryDate;
+
+    notifyListeners();
+    _autoLogout();
+    return true;
   }
 }
