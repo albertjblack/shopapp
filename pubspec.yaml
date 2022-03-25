@@ -68,6 +68,7 @@ flutter:
   assets:
   - assets/images/logo/nerit_n_white.png
   - assets/images/logo/nerit_logo_white.png
+  - assets/images/placeholder/product.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
